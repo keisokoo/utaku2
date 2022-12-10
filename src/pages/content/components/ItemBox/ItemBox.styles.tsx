@@ -7,7 +7,7 @@ const IconWrap = styled.i`
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 10px;
+  font-size: 16px;
   &:hover {
     color: ${colors['White/White off']};
   }
@@ -17,7 +17,7 @@ const IconWrap = styled.i`
   }
 `
 const ImageSize = styled.div`
-  ${typography['Menu/Regular']}
+  ${typography['Body/Small/Regular']}
   padding: 2px 0 4px;
   display: flex;
   align-items: center;
@@ -71,11 +71,11 @@ const ItemBoxStyles = {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 4px;
+    gap: 16px;
     & > div {
       display: flex;
       align-items: center;
-      gap: 4px;
+      gap: 16px;
     }
   `,
   IconWrap,

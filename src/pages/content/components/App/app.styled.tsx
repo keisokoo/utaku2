@@ -1,5 +1,55 @@
 import styled from '@emotion/styled/macro'
+import { colors, typography } from '@src/pages/popup/themes/styles'
 
+export const Controller = styled.div`
+  height: 50px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  backdrop-filter: blur(6px);
+  background-color: rgb(190 190 190 / 50%);
+  padding: 0 22px;
+  color: ${colors['White/White off']};
+  & > div {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  button:disabled {
+    background-color: ${colors['White/White 10%']};
+    color: ${colors['Grayscale/Gray default']};
+    box-shadow: none;
+    cursor: default;
+  }
+  ${typography['Body/Small/Bold']}
+`
+export const Editor = styled(Controller)`
+  background-color: rgb(7 121 255 / 50%);
+`
+export const InputWrap = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-right: 16px;
+`
+export const Input = styled.input`
+  width: 80px;
+  border-radius: 4px;
+  backdrop-filter: blur(6px);
+  background-color: rgb(255 255 255 / 80%);
+  color: ${colors['Grayscale/Gray Dark']};
+  padding: 2px 6px;
+  border: none;
+  &:focus {
+    outline: none;
+    background-color: rgb(255 255 255 / 100%);
+  }
+  ${typography['Body/Small/Bold']}
+`
+export const Left = styled.div``
+export const Right = styled.div``
+export const Center = styled.div``
 export const UtakuImageList = styled.div`
   position: fixed;
   top: 0;
@@ -9,18 +59,38 @@ export const UtakuImageList = styled.div`
   min-width: 300px;
   max-width: 50vw;
   width: 100%;
-  padding: 0 16px;
-  backdrop-filter: blur(6px);
-  background-color: rgb(0 0 0 / 50%);
+  padding: 0;
   transform: translateX(100%);
   transition: 0.3s;
+  .utaku-toggle .active {
+    visibility: hidden;
+    display: none;
+  }
+  .utaku-toggle .in-active {
+    visibility: visible;
+    display: block;
+  }
   &.active {
     transform: translateX(0);
+    .utaku-toggle .active {
+      visibility: visible;
+      display: block;
+    }
+    .utaku-toggle .in-active {
+      visibility: hidden;
+      display: none;
+    }
   }
 
+  * {
+    box-sizing: border-box;
+  }
   .utaku-container {
     width: 100%;
-    height: 100%;
+    height: calc(100% - 100px);
+    padding: 16px;
+    backdrop-filter: blur(6px);
+    background-color: rgb(0 0 0 / 50%);
     overflow-y: auto;
     overscroll-behavior-y: contain;
   }
@@ -42,9 +112,12 @@ export const UtakuImageList = styled.div`
     backdrop-filter: blur(6px);
     background-color: rgb(190 190 190 / 50%);
     width: 30px;
-    height: 30px;
+    height: 50px;
     transform: translate(-30px, 0);
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
   .utaku-dispose-image {
     position: absolute;

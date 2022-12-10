@@ -8,7 +8,9 @@ const onMessage = (
   sender: chrome.runtime.MessageSender,
   sendResponse: (response?: any) => void
 ) => {
-  console.log('back', request, sender)
+  if (request === 'get-available') {
+    console.log('haha', sender?.tab?.id)
+  }
 }
 
 if (!chrome.runtime.onMessage.hasListener(onMessage)) {

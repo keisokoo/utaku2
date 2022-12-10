@@ -31,7 +31,15 @@ const Popup = () => {
     clearList,
     handleRemove,
   } = useWebRequests()
-  const {} = useFileDownload()
+  const { folderName, handleFolderName } = useFileDownload()
+  useEffect(() => {
+    chrome.storage.sync.get(
+      ['sizeLimit', 'folderName', 'replaceFilter', 'folderNameList'],
+      (items) => {
+        if (items.folderName) handleFolderName(items.folderName)
+      }
+    )
+  }, [])
   useEffect(() => {
     const setAvailable = (available?: boolean) => {
       const utaku1209 = document.querySelector('#utaku1209')
@@ -75,7 +83,19 @@ const Popup = () => {
       }
       if (request.download) {
         focusPopup()
-        chrome.downloads.download({ url: request.download })
+        if (typeof request.download === 'string') {
+          chrome.downloads.download({ url: request.download })
+        }
+        if (Array.isArray(request.download) && request.download.length > 0) {
+          for (let i = 0; i < request.download.length; i++) {
+            chrome.downloads.download({ url: request.download[i] })
+          }
+        }
+      }
+      if (request.remove) {
+        ;(request.remove as string[]).forEach((url) => {
+          handleRemove(url)
+        })
       }
     }
 

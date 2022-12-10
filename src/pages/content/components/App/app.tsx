@@ -1,15 +1,40 @@
 import {
+  GrayScaleFill,
+  PrimaryButton,
+  SecondaryButton,
+  WhiteFill,
+} from '@src/pages/popup/components/Buttons'
+import {
   MutableRefObject,
   SyntheticEvent,
   useCallback,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from 'react'
+import {
+  FaCheckCircle,
+  FaChevronLeft,
+  FaChevronRight,
+  FaCircle,
+  FaFileDownload,
+  FaTrash,
+} from 'react-icons/fa'
 import { uniqBy } from 'remeda'
 import { DownloadAbleType } from '../../types'
 import ItemBox from '../ItemBox'
-import { ImageItem, UtakuImageList } from './app.styled'
+import {
+  Center,
+  Controller,
+  Editor,
+  ImageItem,
+  Input,
+  InputWrap,
+  Left,
+  Right,
+  UtakuImageList,
+} from './app.styled'
 
 function getData(): Promise<chrome.webRequest.WebResponseHeadersDetails[]> {
   return new Promise((res) => {
@@ -27,7 +52,8 @@ function getUtakuDom(): HTMLDivElement {
 }
 export default function App() {
   const wrapRef = useRef() as MutableRefObject<HTMLDivElement>
-
+  const [folderName, set_folderName] = useState<string>('')
+  const [nameList, set_nameList] = useState<string[]>([])
   const [downloadAbleList, set_downloadAbleList] = useState<DownloadAbleType[]>(
     []
   )
@@ -80,6 +106,21 @@ export default function App() {
           utakuElement.classList.add('active')
           poolingRef.current = true
           runDataPool()
+
+          chrome.storage.sync.get(
+            ['sizeLimit', 'folderName', 'replaceFilter', 'folderNameList'],
+            (items) => {
+              if (
+                items.sizeLimit &&
+                items.sizeLimit.width &&
+                items.sizeLimit.height
+              )
+                set_sizeLimit(items.sizeLimit)
+              if (items.folderName) set_folderName(items.folderName)
+              // if (items.replaceFilter) set_replaceText(items.replaceFilter);
+              // if (items.folderNameList) set_folderNameList(items.folderNameList);
+            }
+          )
         }
       }
     },
@@ -95,24 +136,19 @@ export default function App() {
         const visibleWithSize =
           sizeLimit.height <= imageTarget.naturalHeight &&
           sizeLimit.width <= imageTarget.naturalWidth
+        const downloadItem = {
+          id: item.requestId,
+          tabId: item.tabId,
+          url: item.url,
+          width: imageTarget.naturalWidth,
+          height: imageTarget.naturalHeight,
+          active: false,
+          visible: visibleWithSize,
+          initiator: item.initiator,
+          timeStamp: item.timeStamp,
+        }
         set_downloadAbleList((prev) =>
-          uniqBy(
-            [
-              ...prev,
-              {
-                id: item.requestId,
-                tabId: item.tabId,
-                url: item.url,
-                width: imageTarget.naturalWidth,
-                height: imageTarget.naturalHeight,
-                active: false,
-                visible: visibleWithSize,
-                initiator: item.initiator,
-                timeStamp: item.timeStamp,
-              },
-            ],
-            (curr) => curr.url
-          )
+          uniqBy([...prev, downloadItem], (curr) => curr.url)
         )
       }
     } finally {
@@ -132,8 +168,194 @@ export default function App() {
       )
     )
   }
+  const handleSelectAll = (active: boolean) => {
+    set_downloadAbleList((prev) =>
+      prev.map((item) =>
+        sizeLimit.height <= item.height && sizeLimit.width <= item.width
+          ? { ...item, active }
+          : item
+      )
+    )
+  }
+  const visibleList = useMemo(() => {
+    return downloadAbleList.filter((item) => {
+      const visibleWithSize =
+        sizeLimit.height <= item.height && sizeLimit.width <= item.width
+      return visibleWithSize
+    })
+  }, [downloadAbleList, sizeLimit])
+
+  const handleSelectedSourcesRemove = (active: boolean) => {
+    set_downloadAbleList((prev) =>
+      prev.filter((item) => item.active !== active)
+    )
+    chrome.runtime.sendMessage({
+      remove: visibleList
+        .filter((item) => item.active === active)
+        .map((item) => item.url),
+    })
+  }
+  const handleSelectedSourcesAll = () => {
+    set_downloadAbleList([])
+    chrome.runtime.sendMessage({
+      remove: visibleList.map((item) => item.url),
+    })
+  }
+  const selectedDownload = () => {
+    chrome.runtime.sendMessage({
+      download: visibleList
+        .filter((item) => item.active)
+        .map((item) => item.url),
+    })
+  }
+  const allDownload = () => {
+    chrome.runtime.sendMessage({
+      download: visibleList.map((item) => item.url),
+    })
+  }
+
   return (
     <UtakuImageList ref={wrapRef}>
+      <Controller>
+        <Left>
+          <WhiteFill
+            _mini
+            onClick={(e) => {
+              e.stopPropagation()
+              handleSelectedSourcesAll()
+            }}
+          >
+            <FaTrash /> All
+          </WhiteFill>
+          <WhiteFill
+            _mini
+            disabled={visibleList.every((item) => !item.active)}
+            onClick={(e) => {
+              e.stopPropagation()
+              handleSelectedSourcesRemove(false)
+            }}
+          >
+            <FaTrash />
+            Deselected
+          </WhiteFill>
+          <WhiteFill
+            _mini
+            disabled={visibleList.every((item) => !item.active)}
+            onClick={(e) => {
+              e.stopPropagation()
+              handleSelectedSourcesRemove(true)
+            }}
+          >
+            <FaTrash />
+            Selected
+          </WhiteFill>
+        </Left>
+        <Center>
+          <GrayScaleFill
+            _mini
+            disabled={visibleList.every((item) => !item.active)}
+            onClick={(e) => {
+              e.stopPropagation()
+              handleSelectAll(false)
+            }}
+          >
+            <FaCircle />
+            All
+          </GrayScaleFill>
+          <GrayScaleFill
+            _mini
+            disabled={visibleList.every((item) => item.active)}
+            onClick={(e) => {
+              e.stopPropagation()
+              handleSelectAll(true)
+            }}
+          >
+            <FaCheckCircle />
+            All
+          </GrayScaleFill>
+        </Center>
+        <Right>
+          <SecondaryButton
+            _mini
+            disabled={!visibleList.some((item) => item.active)}
+            onClick={(e) => {
+              e.stopPropagation()
+              selectedDownload()
+            }}
+          >
+            <FaFileDownload />
+            Selected
+          </SecondaryButton>
+          <PrimaryButton
+            _mini
+            onClick={(e) => {
+              e.stopPropagation()
+              allDownload()
+            }}
+          >
+            <FaFileDownload />
+            All
+          </PrimaryButton>
+        </Right>
+      </Controller>
+      <Editor>
+        <Left>
+          <InputWrap>
+            <span>Folder:</span>
+            <Input
+              value={folderName}
+              onChange={(e) => {
+                set_folderName(e.target.value)
+                // chrome.runtime.sendMessage({ folderName: e.target.value })
+                chrome.storage.sync.set({ folderName: e.target.value })
+              }}
+            />
+          </InputWrap>
+          <InputWrap>
+            <span>width:</span>
+            <Input
+              type={'number'}
+              min={1}
+              value={sizeLimit.width}
+              onChange={(e) => {
+                set_sizeLimit((prev) => ({
+                  ...prev,
+                  width: Number(e.target.value),
+                }))
+                chrome.storage.sync.set({
+                  sizeLimit: { ...sizeLimit, width: Number(e.target.value) },
+                })
+              }}
+            />
+            <span>height:</span>
+            <Input
+              type={'number'}
+              min={1}
+              value={sizeLimit.height}
+              onChange={(e) => {
+                set_sizeLimit((prev) => ({
+                  ...prev,
+                  height: Number(e.target.value),
+                }))
+                chrome.storage.sync.set({
+                  sizeLimit: { ...sizeLimit, height: Number(e.target.value) },
+                })
+              }}
+            />
+          </InputWrap>
+        </Left>
+        <Right>
+          <div>
+            {'( '}
+            <span>
+              {visibleList.filter((item) => item.active).length}
+              {' / '}
+              {visibleList.length}
+            </span>
+            {' )'}
+          </div>
+        </Right>
+      </Editor>
       <div className="utaku-container">
         <div className="utaku-dispose-image">
           {imageList.map((item) => {
@@ -149,7 +371,7 @@ export default function App() {
           })}
         </div>
         <div className="utaku-grid">
-          {downloadAbleList.map((item) => {
+          {visibleList.map((item) => {
             return (
               <ItemBox
                 key={item.id + item.url}
@@ -160,7 +382,10 @@ export default function App() {
           })}
         </div>
       </div>
-      <div className="utaku-toggle" onClick={handleClick}></div>
+      <div className="utaku-toggle" onClick={handleClick}>
+        <FaChevronRight className="active" />
+        <FaChevronLeft className="in-active" />
+      </div>
     </UtakuImageList>
   )
 }
