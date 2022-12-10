@@ -1,5 +1,4 @@
 import { css } from '@emotion/react'
-import { typography } from '../../themes/styles'
 import { buttonAssets, ButtonStyle } from './Buttons.styles'
 import { ButtonTemplateProps } from './Buttons.types'
 
@@ -11,7 +10,6 @@ export const PrimaryButton = ({
   return (
     <ButtonStyle
       _css={css`
-        ${typography['Body/Large/Bold']}
         ${buttonAssets({
           _mini,
           disabledType: 'fill',
@@ -19,7 +17,6 @@ export const PrimaryButton = ({
           hoverBackgroundColor: 'Primary/Dark',
           textColor: 'White/White off',
         })}
-        border-radius: 50px;
         ${_css && _css}
       `}
       {...props}
@@ -37,7 +34,6 @@ export const SecondaryButton = ({
   return (
     <ButtonStyle
       _css={css`
-        ${typography['Body/Large/Bold']}
         ${buttonAssets({
           _mini,
           disabledType: 'fill',
@@ -45,7 +41,7 @@ export const SecondaryButton = ({
           hoverBackgroundColor: 'Secondary/Dark',
           textColor: 'White/White off',
         })}
-        border-radius: 50px;
+
         ${_css && _css}
       `}
       {...props}
@@ -62,7 +58,6 @@ export const DangerButton = ({
   return (
     <ButtonStyle
       _css={css`
-        ${typography['Body/Large/Bold']}
         ${buttonAssets({
           _mini,
           disabledType: 'fill',
@@ -70,7 +65,7 @@ export const DangerButton = ({
           hoverBackgroundColor: 'Danger/Dark',
           textColor: 'White/White off',
         })}
-        border-radius: 50px;
+
         ${_css && _css}
       `}
       {...props}
@@ -90,7 +85,7 @@ export const WhiteFill = ({ _css, _mini, ...props }: ButtonTemplateProps) => {
           hoverBackgroundColor: 'White/White 50%',
           textColor: 'Grayscale/Gray Dark',
         })}
-        border-radius: 50px;
+
         ${_css && _css}
       `}
       {...props}
@@ -114,7 +109,7 @@ export const GrayScaleFill = ({
           hoverBackgroundColor: 'Grayscale/Gray Dark',
           textColor: 'White/White off',
         })}
-        border-radius: 50px;
+
         ${_css && _css}
       `}
       {...props}
@@ -131,7 +126,6 @@ export const GrayScaleText = ({
   return (
     <ButtonStyle
       _css={css`
-        border-radius: 50px;
         ${buttonAssets({
           _mini,
           disabledType: 'text',
@@ -157,7 +151,6 @@ export const GrayScaleOutline = ({
   return (
     <ButtonStyle
       _css={css`
-        border-radius: 50px;
         ${_icon
           ? css`
               width: 40px;

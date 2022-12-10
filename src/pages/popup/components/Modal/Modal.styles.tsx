@@ -1,6 +1,6 @@
 import styled from '@emotion/styled/macro'
-import { colors } from 'themes/styles'
-import { addCssProps } from 'themes/styles.helper'
+import { colors } from '../../themes/styles'
+import { addCssProps } from '../../themes/styles.helper'
 
 const ModalStyle = {
   Wrap: styled.div`
