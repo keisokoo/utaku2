@@ -78,8 +78,8 @@ const Popup = () => {
           sendResponse(sourceGroup[sender.tab.id])
         }
       }
-      if (request === 'get-available') {
-        available(sender?.tab?.id)
+      if (request.checkTabId) {
+        available(request.checkTabId)
       }
       if (request.download) {
         focusPopup()

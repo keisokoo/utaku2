@@ -1,15 +1,34 @@
 import reloadOnUpdate from 'virtual:reload-on-update-in-background-script'
 
 reloadOnUpdate('pages/background')
-console.log('background loaded!3')
+console.log('background loaded!4')
 
+const checkPopup = (callBack: (tabId?: number) => void) => {
+  chrome.tabs.query(
+    { url: chrome.runtime.getURL('src/pages/popup/index.html') },
+    (tabs) => {
+      if (tabs.length > 0 && tabs[0].id) {
+        const tabId = tabs[0].id
+        callBack(tabId)
+      } else {
+        return callBack()
+      }
+    }
+  )
+}
 const onMessage = (
   request: any,
   sender: chrome.runtime.MessageSender,
   sendResponse: (response?: any) => void
 ) => {
   if (request === 'get-available') {
-    console.log('haha', sender?.tab?.id)
+    let checkTabId = sender?.tab?.id
+    checkPopup((popupTabId) => {
+      if (popupTabId && checkTabId) {
+        chrome.runtime.sendMessage({ checkTabId })
+      } else {
+      }
+    })
   }
 }
 
