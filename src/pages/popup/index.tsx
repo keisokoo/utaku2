@@ -1,18 +1,18 @@
-import React from "react";
-import { createRoot } from "react-dom/client";
-import "@pages/popup/index.css";
-import Popup from "@pages/popup/Popup";
-import refreshOnUpdate from "virtual:reload-on-update-in-view";
+import '@pages/popup/index.scss'
+import Popup from '@pages/popup/Popup'
+import { createRoot } from 'react-dom/client'
+import refreshOnUpdate from 'virtual:reload-on-update-in-view'
 
-refreshOnUpdate("pages/popup");
+refreshOnUpdate('pages/popup')
+chrome.runtime.lastError
 
 function init() {
-  const appContainer = document.querySelector("#app-container");
+  const appContainer = document.querySelector('#app-container')
   if (!appContainer) {
-    throw new Error("Can not find AppContainer");
+    throw new Error('Can not find AppContainer')
   }
-  const root = createRoot(appContainer);
-  root.render(<Popup />);
+  const root = createRoot(appContainer)
+  root.render(<Popup />)
 }
 
-init();
+init()
