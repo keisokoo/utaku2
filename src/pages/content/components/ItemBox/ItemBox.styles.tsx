@@ -46,13 +46,13 @@ const ItemBoxStyles = {
       background-color: ${colors['Accent/Light']};
       .check {
         position: absolute;
-        top: 0.2em;
-        left: 0.2em;
-        font-size: 2em;
+        top: 8px;
+        left: 8px;
+        font-size: 16px;
         color: #00bd1e;
-        width: 1em;
-        height: 1em;
-        border-radius: 0.5em;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
         background: #fff;
       }
       ${ImageSize} {
