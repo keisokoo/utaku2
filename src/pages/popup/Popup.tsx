@@ -97,6 +97,10 @@ const Popup = () => {
           handleRemove(url)
         })
       }
+      if (request.folderName) {
+        handleFolderName(request.folderName)
+        chrome.storage.sync.set({ folderName: request.folderName })
+      }
     }
 
     if (!chrome.runtime.onMessage.hasListener(onMessage)) {

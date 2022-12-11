@@ -27,6 +27,7 @@ const onMessage = (
       if (popupTabId && checkTabId) {
         chrome.runtime.sendMessage({ checkTabId })
       } else {
+        sendResponse(false)
       }
     })
   }

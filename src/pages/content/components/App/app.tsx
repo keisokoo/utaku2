@@ -67,7 +67,15 @@ export default function App() {
 
   useEffect(() => {
     const getAvailable = () => {
-      chrome.runtime.sendMessage('get-available')
+      chrome.runtime.sendMessage('get-available', (response) => {
+        if (response) {
+        } else {
+          const utaku1209 = document.querySelector('#utaku1209')
+          if (utaku1209) {
+            utaku1209.classList.remove('available')
+          }
+        }
+      })
     }
     getAvailable()
     document.addEventListener('visibilitychange', getAvailable)
@@ -306,8 +314,7 @@ export default function App() {
               value={folderName}
               onChange={(e) => {
                 set_folderName(e.target.value)
-                // chrome.runtime.sendMessage({ folderName: e.target.value })
-                chrome.storage.sync.set({ folderName: e.target.value })
+                chrome.runtime.sendMessage({ folderName: e.target.value })
               }}
             />
           </InputWrap>
