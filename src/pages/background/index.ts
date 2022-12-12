@@ -9,7 +9,13 @@ const checkPopup = (callBack: (tabId?: number) => void) => {
     (tabs) => {
       if (tabs.length > 0 && tabs[0].id) {
         const tabId = tabs[0].id
-        callBack(tabId)
+        chrome.tabs.get(tabId, (tabs) => {
+          if (chrome.runtime.lastError) {
+            console.log(chrome.runtime.lastError.message)
+          } else {
+            callBack(tabId)
+          }
+        })
       } else {
         return callBack()
       }

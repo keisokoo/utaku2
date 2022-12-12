@@ -13,9 +13,13 @@ const focusPopup = () => {
       if (tabs.length > 0 && tabs[0].id) {
         const tabId = tabs[0].id
         chrome.tabs.get(tabId, (tab) => {
-          chrome.windows.update(tab.windowId, { focused: true }, (win) => {
-            chrome.tabs.update(tabId, { active: true })
-          })
+          if (chrome.runtime.lastError) {
+            console.log(chrome.runtime.lastError.message)
+          } else {
+            chrome.windows.update(tab.windowId, { focused: true }, (win) => {
+              chrome.tabs.update(tabId, { active: true })
+            })
+          }
         })
       }
     }
@@ -59,10 +63,16 @@ const Popup = () => {
             sourceGroup[tabId] &&
             sourceGroup[tabId].length > 0
         )
-        chrome.scripting.executeScript({
-          target: { tabId },
-          func: setAvailable,
-          args: [bool],
+        chrome.tabs.get(tabId, (tabs) => {
+          if (chrome.runtime.lastError) {
+            console.log(chrome.runtime.lastError.message)
+          } else {
+            chrome.scripting.executeScript({
+              target: { tabId },
+              func: setAvailable,
+              args: [bool],
+            })
+          }
         })
       }
     }
@@ -114,14 +124,22 @@ const Popup = () => {
   }, [sourceGroup])
   const handleClickTab = (tabId: number) => {
     chrome.tabs.get(tabId, (tab) => {
-      chrome.windows.update(tab.windowId, { focused: true }, (win) => {
-        chrome.tabs.update(tabId, { active: true })
-      })
+      if (chrome.runtime.lastError) {
+        console.log(chrome.runtime.lastError.message)
+      } else {
+        chrome.windows.update(tab.windowId, { focused: true }, (win) => {
+          chrome.tabs.update(tabId, { active: true })
+        })
+      }
     })
   }
 
   const handleReloadTab = (tabId: number) => {
-    chrome.tabs.reload(tabId)
+    if (chrome.runtime.lastError) {
+      console.log(chrome.runtime.lastError.message)
+    } else {
+      chrome.tabs.reload(tabId)
+    }
   }
 
   return (
