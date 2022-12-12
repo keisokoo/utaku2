@@ -30,7 +30,6 @@ const ItemBoxStyles = {
     opacity: 0.8;
     cursor: pointer;
     transition: ease-out 0.15s;
-    margin-bottom: 1em;
     position: relative;
     &:hover {
       opacity: 1;

@@ -131,6 +131,52 @@ export const UtakuImageList = styled.div`
       height: 1px;
     }
   }
+  &.bottom {
+    top: initial;
+    left: 0;
+    bottom: 0;
+    min-width: 100vw;
+    max-width: 100vw;
+    height: 504px;
+    transform: translateY(100%);
+    &.active {
+      transform: translateY(0);
+    }
+    .utaku-container {
+      overflow-y: hidden;
+      overscroll-behavior-y: contain;
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+    }
+    .utaku-grid {
+      column-count: initial;
+      column-gap: initial;
+      display: flex;
+      gap: 8px;
+    }
+    .image-size {
+      justify-content: flex-start;
+      flex-direction: column;
+    }
+    .image-box img {
+      width: auto;
+      height: 280px;
+      break-inside: avoid;
+      box-sizing: border-box;
+    }
+    .utaku-toggle {
+      left: 50%;
+
+      width: 80px;
+      height: 30px;
+      border-radius: 15px 15px 0 0;
+
+      transform: translate(-50%, -100%);
+      svg {
+        transform: rotate(90deg);
+      }
+    }
+  }
 `
 export const ImageItem = styled.img`
   width: 100%;

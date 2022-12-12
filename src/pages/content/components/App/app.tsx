@@ -221,9 +221,23 @@ export default function App() {
       download: visibleList.map((item) => item.url),
     })
   }
-
+  useEffect(() => {
+    const wheelHorizontal = (e: WheelEvent) => {
+      const utakuBox = document.querySelector('#utaku-box')
+      if (!utakuBox.classList.contains('bottom')) return
+      const utakuContainer = document.querySelector('.utaku-container')
+      const mouseTarget = e.target as HTMLElement
+      if (utakuContainer && mouseTarget) {
+        utakuContainer.scrollLeft += e.deltaY
+      }
+    }
+    window.addEventListener('wheel', wheelHorizontal)
+    return () => {
+      window.removeEventListener('wheel', wheelHorizontal)
+    }
+  }, [])
   return (
-    <UtakuImageList ref={wrapRef}>
+    <UtakuImageList id="utaku-box" ref={wrapRef} className="bottom">
       <Controller>
         <Left>
           <WhiteFill

@@ -36,11 +36,11 @@ const ItemBox = ({ item, handleActive, ...props }: ItemBoxProps) => {
             )}
             <ImageItem key={item.id} src={item.url} alt={item.id} />
           </div>
-          <S.ImageSize>
+          <S.ImageSize className="image-size">
             <span>width: {item.width}px</span>
             <span>height: {item.height}px</span>
           </S.ImageSize>
-          <S.Icons>
+          <S.Icons className="image-icons">
             <div>
               <S.IconWrap
                 onClick={(e) => {
