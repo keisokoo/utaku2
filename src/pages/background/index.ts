@@ -41,7 +41,6 @@ const onMessage = (
   sender: chrome.runtime.MessageSender,
   sendResponse: (response?: any) => void
 ) => {
-  console.log('request', request)
   if (request === 'get-available') {
     let checkTabId = sender?.tab?.id
     if (popupIsOn) {

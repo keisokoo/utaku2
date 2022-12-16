@@ -39,6 +39,17 @@ const ItemBoxStyles = {
     .image-box {
       font-size: 0;
     }
+    .downloaded {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      font-size: 16px;
+      color: #e71300;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #fff;
+    }
     &.active {
       opacity: 1;
       border-radius: 8px;

@@ -7,8 +7,14 @@ import S from './ItemBox.styles'
 interface ItemBoxProps {
   item: DownloadAbleType
   handleActive: (id: string) => void
+  downloaded?: boolean
 }
-const ItemBox = ({ item, handleActive, ...props }: ItemBoxProps) => {
+const ItemBox = ({
+  item,
+  downloaded,
+  handleActive,
+  ...props
+}: ItemBoxProps) => {
   const copyToClipboard = (text: string) => {
     if (navigator.clipboard) {
       navigator.clipboard.writeText(text).then()
@@ -31,6 +37,11 @@ const ItemBox = ({ item, handleActive, ...props }: ItemBoxProps) => {
           <div className="image-box">
             {item.active && (
               <i className="check">
+                <FaCheck />
+              </i>
+            )}
+            {item.downloaded && (
+              <i className="downloaded">
                 <FaCheck />
               </i>
             )}

@@ -48,7 +48,11 @@ export const Input = styled.input`
   ${typography['Body/Small/Bold']}
 `
 export const Left = styled.div``
-export const Right = styled.div``
+export const Right = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 16px;
+`
 export const Center = styled.div``
 export const UtakuImageList = styled.div`
   position: fixed;
@@ -182,4 +186,7 @@ export const ImageItem = styled.img`
   width: 100%;
   break-inside: avoid;
   box-sizing: border-box;
+  &.downloaded {
+    opacity: 0.4;
+  }
 `

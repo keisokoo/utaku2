@@ -35,7 +35,8 @@ const Popup = () => {
     clearList,
     handleRemove,
   } = useWebRequests()
-  const { folderName, handleFolderName } = useFileDownload()
+  const { folderName, downloadedItem, handleFolderName } = useFileDownload()
+
   useEffect(() => {
     chrome.storage.sync.get(
       ['sizeLimit', 'folderName', 'replaceFilter', 'folderNameList'],
@@ -85,8 +86,9 @@ const Popup = () => {
       sendResponse: (response?: any) => void
     ) => {
       if (request === 'get-user-data') {
-        if (sourceGroup[sender?.tab?.id]) {
-          sendResponse(sourceGroup[sender.tab.id])
+        if (sourceGroup?.[sender?.tab?.id]) {
+          const data = sourceGroup[sender.tab.id]
+          sendResponse({ list: data, downloaded: downloadedItem })
         }
       }
       if (request.checkTabId) {
@@ -95,10 +97,12 @@ const Popup = () => {
       if (request.download) {
         focusPopup()
         if (typeof request.download === 'string') {
+          handleRemove(request.download)
           chrome.downloads.download({ url: request.download })
         }
         if (Array.isArray(request.download) && request.download.length > 0) {
           for (let i = 0; i < request.download.length; i++) {
+            handleRemove(request.download[i])
             chrome.downloads.download({ url: request.download[i] })
           }
         }
@@ -122,7 +126,7 @@ const Popup = () => {
         chrome.runtime.onMessage.removeListener(onMessage)
       }
     }
-  }, [sourceGroup])
+  }, [sourceGroup, downloadedItem])
   const handleClickTab = (tabId: number) => {
     chrome.tabs.get(tabId, (tab) => {
       if (chrome.runtime.lastError) {

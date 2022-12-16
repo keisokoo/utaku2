@@ -1,4 +1,5 @@
 import {
+  DangerButton,
   GrayScaleFill,
   PrimaryButton,
   SecondaryButton,
@@ -36,12 +37,17 @@ import {
   UtakuImageList,
 } from './app.styled'
 
-function getData(): Promise<chrome.webRequest.WebResponseHeadersDetails[]> {
+type chromeDownloadItem = chrome.webRequest.WebResponseHeadersDetails
+
+function getData(): Promise<{
+  list: chromeDownloadItem[]
+  downloaded: string[]
+}> {
   return new Promise((res) => {
     chrome.runtime.sendMessage(
       'get-user-data',
-      (response: chrome.webRequest.WebResponseHeadersDetails[]) => {
-        res(response ? response : [])
+      (response: { list: chromeDownloadItem[]; downloaded: string[] }) => {
+        res({ ...response })
         return false
       }
     )
@@ -53,16 +59,17 @@ function getUtakuDom(): HTMLDivElement {
 }
 export default function App() {
   const wrapRef = useRef() as MutableRefObject<HTMLDivElement>
+  const [live, set_live] = useState<boolean>(true)
   const [folderName, set_folderName] = useState<string>('')
-  const [nameList, set_nameList] = useState<string[]>([])
+  // const [nameList, set_nameList] = useState<string[]>([])
+
+  const [downloadedItem, set_downloadedItem] = useState<string[]>([])
   const [downloadAbleList, set_downloadAbleList] = useState<DownloadAbleType[]>(
     []
   )
   const [sizeLimit, set_sizeLimit] = useState({ width: 500, height: 500 })
 
-  const [imageList, set_imageList] = useState<
-    chrome.webRequest.WebResponseHeadersDetails[]
-  >([])
+  const [imageList, set_imageList] = useState<chromeDownloadItem[]>([])
   const timeoutRef = useRef() as MutableRefObject<NodeJS.Timeout>
   const poolingRef = useRef(false) as MutableRefObject<boolean>
 
@@ -95,7 +102,9 @@ export default function App() {
   const runDataPool = useCallback(() => {
     clearTimeout(timeoutRef.current)
     timeoutRef.current = setTimeout(async () => {
-      set_imageList(await getData())
+      const data = await getData()
+      set_imageList(data.list)
+      set_downloadedItem(data.downloaded)
       const utakuElement = getUtakuDom()
       if (poolingRef.current && utakuElement?.classList.contains('available')) {
         runDataPool()
@@ -104,9 +113,11 @@ export default function App() {
   }, [])
 
   const handleRemove = (item: chrome.webRequest.WebResponseHeadersDetails) => {
-    set_imageList((prev) =>
-      prev.filter((curr) => curr.requestId !== item.requestId)
-    )
+    set_imageList((prev) => {
+      // prev.filter((curr) => curr.requestId !== item.requestId)
+      if (prev[item.url]) delete prev[item.url]
+      return prev
+    })
   }
   const handleClick = useCallback(
     (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
@@ -120,7 +131,6 @@ export default function App() {
           utakuElement.classList.add('active')
           poolingRef.current = true
           runDataPool()
-
           chrome.storage.sync.get(
             ['sizeLimit', 'folderName', 'replaceFilter', 'folderNameList'],
             (items) => {
@@ -142,7 +152,7 @@ export default function App() {
   )
   const handleOnLoad = (
     e: SyntheticEvent<HTMLImageElement, Event>,
-    item: chrome.webRequest.WebResponseHeadersDetails
+    item: chromeDownloadItem
   ) => {
     try {
       const imageTarget = e.target as EventTarget & HTMLImageElement
@@ -174,6 +184,9 @@ export default function App() {
     item: chrome.webRequest.WebResponseHeadersDetails
   ) => {
     handleRemove(item)
+    chrome.runtime.sendMessage({
+      remove: [item.url],
+    })
   }
   const toggleActive = (id: string) => {
     set_downloadAbleList((prev) =>
@@ -192,12 +205,16 @@ export default function App() {
     )
   }
   const visibleList = useMemo(() => {
-    return downloadAbleList.filter((item) => {
-      const visibleWithSize =
-        sizeLimit.height <= item.height && sizeLimit.width <= item.width
-      return visibleWithSize
-    })
-  }, [downloadAbleList, sizeLimit])
+    return downloadAbleList
+      .filter((item) => {
+        const visibleWithSize =
+          sizeLimit.height <= item.height && sizeLimit.width <= item.width
+        return visibleWithSize
+      })
+      .filter((item) => {
+        return !downloadedItem.includes(item.url)
+      })
+  }, [downloadAbleList, sizeLimit, downloadedItem])
 
   const handleSelectedSourcesRemove = (active: boolean) => {
     set_downloadAbleList((prev) =>
@@ -385,6 +402,29 @@ export default function App() {
             </span>
             {' )'}
           </div>
+          {live && (
+            <DangerButton
+              _mini
+              onClick={() => {
+                set_live(false)
+                poolingRef.current = false
+              }}
+            >
+              Live
+            </DangerButton>
+          )}
+          {!live && (
+            <GrayScaleFill
+              _mini
+              onClick={() => {
+                set_live(true)
+                poolingRef.current = true
+                runDataPool()
+              }}
+            >
+              Live
+            </GrayScaleFill>
+          )}
         </Right>
       </Editor>
       <div className="utaku-container">
@@ -405,6 +445,7 @@ export default function App() {
           {visibleList.map((item) => {
             return (
               <ItemBox
+                downloaded={item.downloaded}
                 key={item.id + item.url}
                 item={item}
                 handleActive={toggleActive}

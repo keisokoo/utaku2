@@ -71,6 +71,7 @@ const useWebRequests = (active = true) => {
   )
 
   useEffect(() => {
+    console.log('sourceGroup', sourceGroup)
     const TabIdList = Object.keys(sourceGroup).map((keyName) => Number(keyName))
     set_tabIdList((prev) => (equals(prev, TabIdList) ? prev : TabIdList))
   }, [sourceGroup])

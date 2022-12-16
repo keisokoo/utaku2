@@ -9,4 +9,5 @@ export interface DownloadAbleType {
   visible: boolean
   initiator?: string
   timeStamp: number
+  downloaded?: boolean
 }
