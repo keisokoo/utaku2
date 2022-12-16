@@ -43,6 +43,7 @@ const Popup = () => {
         if (items.folderName) handleFolderName(items.folderName)
       }
     )
+    chrome.runtime.connect({ name: 'popup' })
   }, [])
   useEffect(() => {
     const setAvailable = (available?: boolean) => {
@@ -65,7 +66,7 @@ const Popup = () => {
         )
         chrome.tabs.get(tabId, (tabs) => {
           if (chrome.runtime.lastError) {
-            console.log(chrome.runtime.lastError.message)
+            console.log(chrome.runtime.lastError)
           } else {
             chrome.scripting.executeScript({
               target: { tabId },

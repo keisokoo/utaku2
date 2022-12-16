@@ -94,7 +94,7 @@ const useWebRequests = (active = true) => {
       req: chrome.webRequest.WebResponseHeadersDetails
     ) {
       if (req.type === 'image') {
-        chrome.runtime.sendMessage({ source: req })
+        // chrome.runtime.sendMessage({ source: req })
         set_sourceList((prev) => uniqBy([...prev, req], (curr) => curr.url))
       }
     }

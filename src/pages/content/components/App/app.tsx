@@ -42,6 +42,7 @@ function getData(): Promise<chrome.webRequest.WebResponseHeadersDetails[]> {
       'get-user-data',
       (response: chrome.webRequest.WebResponseHeadersDetails[]) => {
         res(response ? response : [])
+        return false
       }
     )
   })
@@ -69,12 +70,17 @@ export default function App() {
     const getAvailable = () => {
       chrome.runtime.sendMessage('get-available', (response) => {
         if (response) {
+          // const utaku1209 = document.querySelector('#utaku1209')
+          // if (utaku1209) {
+          //   utaku1209.classList.add('available')
+          // }
         } else {
           const utaku1209 = document.querySelector('#utaku1209')
           if (utaku1209) {
             utaku1209.classList.remove('available')
           }
         }
+        return true
       })
     }
     getAvailable()
@@ -227,7 +233,11 @@ export default function App() {
       if (!utakuBox.classList.contains('bottom')) return
       const utakuContainer = document.querySelector('.utaku-container')
       const mouseTarget = e.target as HTMLElement
-      if (utakuContainer && mouseTarget) {
+      if (
+        utakuContainer &&
+        mouseTarget &&
+        utakuContainer.contains(mouseTarget)
+      ) {
         utakuContainer.scrollLeft += e.deltaY
       }
     }

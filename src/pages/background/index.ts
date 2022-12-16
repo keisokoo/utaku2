@@ -1,9 +1,23 @@
 import reloadOnUpdate from 'virtual:reload-on-update-in-background-script'
 
 reloadOnUpdate('pages/background')
-console.log('background loaded!4')
-
+let popupIsOn = false
+console.log('background loaded!5')
+chrome.runtime.onConnect.addListener(function (port) {
+  if (port.name === 'popup') {
+    popupIsOn = true
+    console.log('popup has been opened!')
+    port.onDisconnect.addListener(function () {
+      console.log('popup has been closed')
+      popupIsOn = false
+    })
+  }
+})
 const checkPopup = (callBack: (tabId?: number) => void) => {
+  console.log('popupIsOn', popupIsOn)
+  if (popupIsOn) {
+    callBack()
+  }
   chrome.tabs.query(
     { url: chrome.runtime.getURL('src/pages/popup/index.html') },
     (tabs) => {
@@ -27,16 +41,17 @@ const onMessage = (
   sender: chrome.runtime.MessageSender,
   sendResponse: (response?: any) => void
 ) => {
+  console.log('request', request)
   if (request === 'get-available') {
     let checkTabId = sender?.tab?.id
-    checkPopup((popupTabId) => {
-      if (popupTabId && checkTabId) {
-        chrome.runtime.sendMessage({ checkTabId })
-      } else {
-        sendResponse(false)
-      }
-    })
+    if (popupIsOn) {
+      sendResponse(true)
+      chrome.runtime.sendMessage({ checkTabId })
+    } else {
+      sendResponse(false)
+    }
   }
+  return true
 }
 
 if (!chrome.runtime.onMessage.hasListener(onMessage)) {

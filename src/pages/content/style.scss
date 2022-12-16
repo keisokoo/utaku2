@@ -2,7 +2,9 @@
 
 #utaku1209 {
   visibility: hidden;
+  display: none;
   &.available {
     visibility: visible;
+    display: block;
   }
 }
